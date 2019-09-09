@@ -22,10 +22,10 @@ var svg = d3.select("#scatter")
 
 // Append an SVG group and transform it so that it fits within the margins
 var chart = svg.append("g")
-               .attr("transform", `translate(${width}, ${height})`);
+               .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Import the data and then build the scatterplot
-d3.csv("../data/data.csv")
+d3.csv("assets/data/data.csv")
   .then(function(data) {
 
     // Make sure all numerical data is actually numerical and not strings
@@ -34,8 +34,8 @@ d3.csv("../data/data.csv")
         d.povertyMoe = parseFloat(d.povertyMoe);
         d.age = parseFloat(d.age);
         d.ageMoe = parseFloat(d.ageMoe);
-        d.income = int(d.income);
-        d.incomeMoe = int(d.incomeMoe);
+        d.income = +d.income;
+        d.incomeMoe = +d.incomeMoe;
         d.healthcare = parseFloat(d.healthcare);
         d.healthcareLow = parseFloat(d.healthcareLow);
         d.healthcareHigh = parseFloat(d.healthcareHigh);
@@ -45,6 +45,7 @@ d3.csv("../data/data.csv")
         d.smokes = parseFloat(d.smokes);
         d.smokesLow = parseFloat(d.smokesLow);
         d.smokesHigh = parseFloat(d.smokesHigh);
+        console.log(d.abbr); // logging the d.abbr column to demonstrate this data is being loaded correctly
     });
 
     // Create scale variables for the x and y axes comparing smoking vs. poverty
@@ -62,24 +63,46 @@ d3.csv("../data/data.csv")
 
     // Add these axes to the SVG group defined above this data function
     chart.append("g")
-         .call("yAxis");
+         .call(yAxis);
 
     chart.append("g")
          .attr("transform", `translate(0,${height})`)
-         .call("xAxis");
-    
-    // Create circles (or dots) for each data point on the chart
-    var circlesGroup = chart.selectAll("circle")
-                            .data(data)
-                            .enter()
-                            .append("circle")
-                            .attr("cx", d => xScale(d.smokes))
-                            .attr("cy", d => yScale(d.poverty))
-                            .attr("r", "15")
-                            .attr("fill", "#4CC4B7")
-                            .attr("opacity", ".5");
+         .call(xAxis);
 
-    // 
+    // Create circles for each state
+    chart.selectAll("circle")
+         .data(data)
+         .enter()
+         .append("circle")
+         .attr("cx", d => xScale(d.smokes))
+         .attr("cy", d => yScale(d.poverty))
+         .attr("r", "15")
+         .attr("fill", "#4CC4B7")
+         .attr("opacity", ".85");
+    
+    // Create state abbreviation text labels to go on top of each of the circles
+    chart.selectAll("text")
+         .data(data)
+         .enter()
+         .append("text")
+         .attr("fill", "white")
+         .attr("x", d => xScale(d.smokes) - 12)
+         .attr("y", d => yScale(d.poverty) + 7)
+         .text(d => d.abbr);
+
+    // Create axes labels
+    chart.append("text")
+         .attr("transform", "rotate(-90)")
+         .attr("y", 0 - margin.left + 40)
+         .attr("x", 0 - (height / 2) - 40)
+         .attr("dy", "1em")
+         .attr("class", "axisText")
+         .text("In Poverty (%)");
+
+    chart.append("text")
+         .attr("transform", `translate(${width / 2 - 40}, ${height + margin.top + 30})`)
+         .attr("class", "axisText")
+         .text("Smokers (%)");
 
   });
 
