@@ -45,8 +45,7 @@ d3.csv("assets/data/data.csv")
         d.smokes = parseFloat(d.smokes);
         d.smokesLow = parseFloat(d.smokesLow);
         d.smokesHigh = parseFloat(d.smokesHigh);
-        console.log(d.abbr); // logging the d.abbr column to demonstrate this data is being loaded correctly
-    });
+     });
 
     // Create scale variables for the x and y axes comparing smoking vs. poverty
     xScale = d3.scaleLinear()
@@ -70,7 +69,7 @@ d3.csv("assets/data/data.csv")
          .call(xAxis);
 
     // Create circles for each state
-    chart.selectAll("circle")
+    chart.append("g").selectAll("circle")
          .data(data)
          .enter()
          .append("circle")
@@ -81,7 +80,7 @@ d3.csv("assets/data/data.csv")
          .attr("opacity", ".85");
     
     // Create state abbreviation text labels to go on top of each of the circles
-    chart.selectAll("text")
+    chart.append("g").selectAll("text")
          .data(data)
          .enter()
          .append("text")
